@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@700&display=swap');
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+
+
+.leaflet-container p{
+  font-family: 'Merriweather', serif;
+}
+
+.leaflet-container h1{
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: large;
+  font-weight: 700;
+}
+
+#map { height: 180px; }
