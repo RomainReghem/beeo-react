@@ -12,6 +12,9 @@ body,
 .leaflet-container p{
   font-family: 'Merriweather', serif;
 }
+.leaflet-container button{
+  font-family: 'Merriweather', serif;
+}
 
 .leaflet-container h1{
   font-family: 'Merriweather Sans', sans-serif;

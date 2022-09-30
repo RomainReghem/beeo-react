@@ -15,6 +15,7 @@ import fermesBioJSON from './jsons/farmsData.json'
 import { useRef, useState } from "react";
 import * as L from "leaflet";
 import UserMarkers from "./UserMarkers";
+import AddMarker from "./AddMarker";
 
 const zonesBio = zonesBioJSON.data;
 const rivieres = rivieresJSON.data;
@@ -63,6 +64,7 @@ const Map = () => {
     const [displayRivieres, setDisplayRivieres] = useState(false)
     const [userMarkersRadius, setUserMarkersRadius] = useState(3000)
     const [placementActivated, setPlacementActivated] = useState(false)
+    const [displayUserMarkers, setDisplayUserMarkers] = useState(true)
 
     return (
         <>
@@ -72,14 +74,16 @@ const Map = () => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
+                    
                     {displayZonesBio && <GeoJSON data={zonesBio} color='green' onEachFeature={onEachZoneBio}></GeoJSON>}
                     {displayRivieres && <GeoJSON data={rivieres} pointToLayer={customMarkerRiviere} onEachFeature={onEachRiviere}></GeoJSON>}
                     {displayFermesBio && <GeoJSON data={fermesBio} pointToLayer={customMarkerFermeBio} onEachFeature={onEachFermeBio}></GeoJSON>}
-                    <UserMarkers radius={userMarkersRadius} placementActivated={placementActivated} />
+                    {/* <UserMarkers radius={userMarkersRadius} placementActivated={placementActivated} /> */}
+                    <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                 </MapContainer>
 
 
-                <Stack gap={4} p={'8'} paddingLeft={'6'} w={'lg'} zIndex={2} overflow='auto'>
+                <Stack gap={4} p={'8'} paddingLeft={'6'} w={'lg'} zIndex={2} overflowY='auto'>
                     <Heading fontWeight={'black'}>GeoBeeo</Heading>
                     <Stack gap={2}>
                         <Heading fontSize={'lg'}>Poser un marqueur</Heading>
@@ -98,7 +102,7 @@ const Map = () => {
                             <Button onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
                             {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
                             </Button>
-                            <Button colorScheme={'orange'}>Reset</Button>
+                            <Button onClick={() => {setDisplayUserMarkers(false)}} colorScheme={'orange'}>Reset</Button>
                         </Stack>
                     </Stack>
                     <Divider></Divider>
