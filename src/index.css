@@ -23,3 +23,37 @@ body,
 }
 
 #map { height: 180px; }
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  #homepage {
+    scrollbar-width: auto;
+    scrollbar-color: #f7ffe0;
+  }
+
+  /* Chrome, Edge, and Safari */
+  #homepage ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #homepage ::-webkit-scrollbar-thumb {
+    background-color: #f7ffe0;
+    border-radius: 10px;
+  }
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  #mappage {
+    scrollbar-width: auto;
+    scrollbar-color: #38A169;
+  }
+
+  /* Chrome, Edge, and Safari */
+  #mappage ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #mappage ::-webkit-scrollbar-thumb {
+    background-color: #38A169;
+    border-radius: 10px;
+    border:2px solid white
+  }

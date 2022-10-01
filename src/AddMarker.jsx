@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Circle, LayerGroup, Marker, Popup, useMapEvents } from "react-leaflet";
+import { Circle, CircleMarker, LayerGroup, Marker, Popup, useMapEvents } from "react-leaflet";
 
 export default function AddMarker({ radius, placementActivated }) {
     const [coord, setPosition] = useState([]);
