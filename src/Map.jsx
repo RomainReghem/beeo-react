@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Heading, Icon, IconButton, Stack, Switch, Text } from "@chakra-ui/react"
+import { Box, Button, Code, Divider, Heading, Icon, IconButton, Stack, Switch, Text } from "@chakra-ui/react"
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon, GeoJSON, LayerGroup, useMapEvents } from "react-leaflet";
 import {
     Slider,
@@ -15,8 +15,10 @@ import fermesBioJSON from './jsons/farmsData.json'
 import pollusolJSON from './jsons/pollusol.json'
 import zonesIndusJSON from './jsons/zonesIndus.json'
 import pollusolPointsJSON from './jsons/pollusolPoints.json'
-import  pollusolPointsOccitanieJSON from './jsons/pollusolPointsOccitanie.json'
-import  pollusolOccitanieJSON from './jsons/pollusolOccitanie.json'
+import pollusolPointsOccitanieJSON from './jsons/pollusolPointsOccitanie.json'
+import pollusolOccitanieJSON from './jsons/pollusolOccitanie.json'
+import eoliennesOccitanieJSON from './jsons/eoliennesOccitanie.json'
+import eoliennesJSON from './jsons/eoliennes.json'
 import { useEffect, useRef, useState } from "react";
 import * as L from "leaflet";
 import AddMarker from "./AddMarker";
@@ -30,6 +32,8 @@ const pollusolPoints = pollusolPointsJSON.data;
 const pollusolPointsOccitanie = pollusolPointsOccitanieJSON.data;
 const pollusolOccitanie = pollusolOccitanieJSON.data;
 const zonesIndus = zonesIndusJSON.data;
+const eoliennesOccitanie = eoliennesOccitanieJSON.data;
+const eoliennes = eoliennesJSON.data;
 const fermesBioIcon = new L.Icon({
     iconUrl: '/farm.png',
     iconSize: [36, 42]
@@ -44,6 +48,10 @@ const pollusolIcon = new L.Icon({
 })
 const zonesIndusIcon = new L.Icon({
     iconUrl: '/indus.png',
+    iconSize: [36, 42]
+})
+const eoliennesIcon = new L.Icon({
+    iconUrl: '/wind.png',
     iconSize: [36, 42]
 })
 
@@ -76,6 +84,10 @@ const onEachZoneIndus = (feature, layer) => {
     layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
 }
 
+const onEachEolienne = (feature, layer) => {
+    layer.bindPopup("<center><h1>Eolienne</h1></center>");
+}
+
 const customMarkerFermeBio = (feature, latlng) => {
     return L.marker(latlng, { icon: fermesBioIcon })
 }
@@ -92,26 +104,32 @@ const customMarkerZonesIndus = (feature, latlng) => {
     return L.marker(latlng, { icon: zonesIndusIcon })
 }
 
+const customMarkerEoliennes = (feature, latlng) => {
+    return L.marker(latlng, { icon: eoliennesIcon })
+}
+
 const Map = () => {
     const navigate = useNavigate()
     const [display, setDisplay] = useState({
-        zonesBio:false,
-        fermesBio:false,
-        rivieres:false,
-        pollusol:false,
-        indus:false,
+        zonesBio: false,
+        fermesBio: false,
+        rivieres: false,
+        pollusol: false,
+        indus: false,
+        eoliennes: false,
     })
 
     // By default, only Tarn region.
-    const [onlyTarn, setOnlyTarn] = useState(true)    
+    const [onlyTarn, setOnlyTarn] = useState(true)
 
     useEffect(() => {
         setDisplay({
-            zonesBio:false,
-            fermesBio:false,
-            rivieres:false,
-            pollusol:false,
-            indus:false,
+            zonesBio: false,
+            fermesBio: false,
+            rivieres: false,
+            pollusol: false,
+            indus: false,
+            eoliennes: false,
         })
     }, [onlyTarn])
 
@@ -120,7 +138,7 @@ const Map = () => {
 
     return (
         <>
-            <Stack id="mappage" direction={'row'} h={'100vh'}>
+            <Stack id="mappage" direction={['column','row']} h={'100vh'}>
                 <MapContainer preferCanvas={true} style={{ zIndex: 1, height: '100vh', width: '100%' }} center={[43.606214, 2.241295]} zoom={13} scrollWheelZoom={true}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -136,36 +154,40 @@ const Map = () => {
                             <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={customMarkerPollusol} onEachFeature={onEachPollusol}></GeoJSON>
                         </>
                     }
+                    {display.eoliennes && <GeoJSON data={onlyTarn ? eoliennes : eoliennesOccitanie} pointToLayer={customMarkerEoliennes} onEachFeature={onEachEolienne}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                 </MapContainer>
 
 
-                <Stack gap={4} p={'8'} paddingLeft={'6'} w={'lg'} zIndex={2} overflowY='auto'>
-                    <Heading cursor={'pointer'} onClick={() => navigate('/')} fontWeight={'black'}>GeoBeeo</Heading>
-                    <Stack gap={2}>
-                        <Heading fontSize={'lg'}>Poser un marqueur</Heading>
-                        <Stack>
-                            <Text fontSize={'sm'}>Rayon de {userMarkersRadius} m</Text>
-                            <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'bee'}>
-                                <SliderTrack>
-                                    <SliderFilledTrack />
-                                </SliderTrack>
-                                <SliderThumb boxSize={6}>
-                                    <Icon as={BiRadar} />
-                                </SliderThumb>
-                            </Slider>
-                        </Stack>
-                        <Stack direction={'row'}>
-                            <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
-                                {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
-                            </Button>
-                        </Stack>
+                <Stack ml={'0px !important'} w={['100%','xl']} zIndex={2} overflowY='auto'>
+                    <Stack bg={'green.500'} p={'8'}>
+                        <Heading color={'white'} cursor={'pointer'} onClick={() => navigate('/')} fontWeight={'black'}>GeoBeeo</Heading>
                     </Stack>
-                    <Divider></Divider>
-                    <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                    <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn}/>
-
+                    <Stack p={'8'} gap={4}>
+                        <Stack gap={2}>
+                            <Heading fontSize={'lg'}>Marqueurs</Heading>
+                            <Stack>
+                                <Text fontSize={'sm'}>{placementActivated ? 'Cliquez' : 'Activez la pose des marqueurs et cliquez'} sur la carte pour poser un marqueur de <Code fontFamily={'body'} colorScheme={'green'}>{userMarkersRadius}</Code>m de rayon</Text>
+                                <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'green'}>
+                                    <SliderTrack>
+                                        <SliderFilledTrack />
+                                    </SliderTrack>
+                                    <SliderThumb boxSize={6}>
+                                        <Icon as={BiRadar} />
+                                    </SliderThumb>
+                                </Slider>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
+                                    {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
+                                </Button>
+                            </Stack>
+                        </Stack>
+                        <Divider borderColor={'gray.400'}></Divider>
+                        <Heading fontSize={'lg'}>Sélection des calques</Heading>
+                        <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
+                    </Stack>
                 </Stack>
 
             </Stack>
