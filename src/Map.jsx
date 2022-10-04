@@ -15,7 +15,9 @@ import fermesBioJSON from './jsons/farmsData.json'
 import pollusolJSON from './jsons/pollusol.json'
 import zonesIndusJSON from './jsons/zonesIndus.json'
 import pollusolPointsJSON from './jsons/pollusolPoints.json'
-import { useRef, useState } from "react";
+import  pollusolPointsOccitanieJSON from './jsons/pollusolPointsOccitanie.json'
+import  pollusolOccitanieJSON from './jsons/pollusolOccitanie.json'
+import { useEffect, useRef, useState } from "react";
 import * as L from "leaflet";
 import AddMarker from "./AddMarker";
 import { useNavigate } from "react-router-dom";
@@ -24,22 +26,24 @@ const zonesBio = zonesBioJSON.data;
 const rivieres = rivieresJSON.data;
 const fermesBio = fermesBioJSON.data;
 const pollusol = pollusolJSON.data;
-const zonesIndus = zonesIndusJSON.data;
 const pollusolPoints = pollusolPointsJSON.data;
+const pollusolPointsOccitanie = pollusolPointsOccitanieJSON.data;
+const pollusolOccitanie = pollusolOccitanieJSON.data;
+const zonesIndus = zonesIndusJSON.data;
 const fermesBioIcon = new L.Icon({
-    iconUrl: './src/assets/farm.png',
+    iconUrl: '/farm.png',
     iconSize: [36, 42]
 })
 const rivieresIcon = new L.Icon({
-    iconUrl: './src/assets/river.png',
+    iconUrl: '/river.png',
     iconSize: [36, 42]
 })
 const pollusolIcon = new L.Icon({
-    iconUrl: './src/assets/pollu.png',
+    iconUrl: '/pollu.png',
     iconSize: [36, 42]
 })
 const zonesIndusIcon = new L.Icon({
-    iconUrl: './src/assets/indus.png',
+    iconUrl: '/indus.png',
     iconSize: [36, 42]
 })
 
@@ -53,23 +57,23 @@ const calculateRiverNote = (note) => {
 }
 
 const onEachZoneBio = (feature, layer) => {
-    layer.bindPopup("<center><h1>Exploitation biologique</h1><img style='width:100%;'src='./src/assets/bio.jpeg'/><p>Type de culture :" + feature.properties.LBL_CULTU + "</p><p>Surface : " + feature.properties?.SURFACE_HA + " hectares</p></center>");
+    layer.bindPopup("<center><h1>Exploitation biologique</h1><img style='width:100%;'src='/bio.jpeg'/><p>Type de culture :" + feature.properties.LBL_CULTU + "</p><p>Surface : " + feature.properties?.SURFACE_HA + " hectares</p></center>");
 }
 
 const onEachFermeBio = (feature, layer) => {
-    layer.bindPopup("<center><h1>Ferme</h1><img style='width:50%;'src='./src/assets/farm1.png'/><p>Nom : " + feature.properties.Nom + "</p><p>Ville " + feature.properties.Ville + "<p> Adresse: " + feature.properties.Address + "</p>" + "<p> Produits: " + feature.properties.Produits + "</p>" + "</p><a target=_blank href='" + feature.properties.Location + "'>lien maps<a></center>");
+    layer.bindPopup("<center><h1>Ferme</h1><img style='width:50%;'src='/farm1.png'/><p>Nom : " + feature.properties.Nom + "</p><p>Ville " + feature.properties.Ville + "<p> Adresse: " + feature.properties.Address + "</p>" + "<p> Produits: " + feature.properties.Produits + "</p>" + "</p><a target=_blank href='" + feature.properties.Location + "'>lien maps<a></center>");
 }
 
 const onEachRiviere = (feature, layer) => {
-    layer.bindPopup("<center><h1>Rivière</h1><img style='width:50%;'src='./src/assets/river1.png'/><p>Libelle : " + feature.properties.Libelle + "</p><p>Commune:  " + feature.properties.Commune + "<p> Localisation: " + feature.properties.Localisation + "</p>" + "<p> Resultat: " + feature.properties.Resultat + "  " + calculateRiverNote(feature.properties.Resultat) + "</p>" + "<p> <a href='http://adour-garonne.eaufrance.fr'>Ressource</a></p>");
+    layer.bindPopup("<center><h1>Rivière</h1><img style='width:50%;'src='/river1.png'/><p>Libelle : " + feature.properties.Libelle + "</p><p>Commune:  " + feature.properties.Commune + "<p> Localisation: " + feature.properties.Localisation + "</p>" + "<p> Resultat: " + feature.properties.Resultat + "  " + calculateRiverNote(feature.properties.Resultat) + "</p>" + "<p> <a href='http://adour-garonne.eaufrance.fr'>Ressource</a></p>");
 }
 
 const onEachPollusol = (feature, layer) => {
-    layer.bindPopup("<center><h1>Zone polluée</h1><img style='width:100%;'src='./src/assets/pollu1.png'/><p>Description : " + feature.properties.descript + "</p></center>");
+    layer.bindPopup("<center><h1>Zone polluée</h1><img style='width:100%;'src='/pollu1.png'/><p>Description : " + feature.properties.descript + "</p></center>");
 }
 
 const onEachZoneIndus = (feature, layer) => {
-    layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='./src/assets/indus1.png'/><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
+    layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
 }
 
 const customMarkerFermeBio = (feature, latlng) => {
@@ -98,6 +102,19 @@ const Map = () => {
         indus:false,
     })
 
+    // By default, only Tarn region.
+    const [onlyTarn, setOnlyTarn] = useState(true)    
+
+    useEffect(() => {
+        setDisplay({
+            zonesBio:false,
+            fermesBio:false,
+            rivieres:false,
+            pollusol:false,
+            indus:false,
+        })
+    }, [onlyTarn])
+
     const [userMarkersRadius, setUserMarkersRadius] = useState(3000)
     const [placementActivated, setPlacementActivated] = useState(false)
 
@@ -115,8 +132,8 @@ const Map = () => {
                     {display.fermesBio && <GeoJSON data={fermesBio} pointToLayer={customMarkerFermeBio} onEachFeature={onEachFermeBio}></GeoJSON>}
                     {display.indus && <GeoJSON data={zonesIndus} pointToLayer={customMarkerZonesIndus} onEachFeature={onEachZoneIndus}></GeoJSON>}
                     {
-                        display.pollusol && <> <GeoJSON data={pollusol} color='red' onEachFeature={onEachPollusol}></GeoJSON>
-                            <GeoJSON data={pollusolPoints} pointToLayer={customMarkerPollusol} onEachFeature={onEachPollusol}></GeoJSON>
+                        display.pollusol && <> <GeoJSON data={onlyTarn ? pollusol : pollusolOccitanie} color='red' onEachFeature={onEachPollusol}></GeoJSON>
+                            <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={customMarkerPollusol} onEachFeature={onEachPollusol}></GeoJSON>
                         </>
                     }
 
@@ -147,7 +164,7 @@ const Map = () => {
                     </Stack>
                     <Divider></Divider>
                     <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                    <Calques setDisplay={setDisplay}/>
+                    <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn}/>
 
                 </Stack>
 
