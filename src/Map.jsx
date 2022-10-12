@@ -1,4 +1,4 @@
-import { Box, Button, Code, Divider, Heading, Icon, IconButton, Stack, Switch, Text } from "@chakra-ui/react"
+import { Box, Button, Code, Divider, Heading, Icon, IconButton, Input, InputGroup, InputLeftElement, Stack, Switch, Text } from "@chakra-ui/react"
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon, GeoJSON, LayerGroup, useMapEvents } from "react-leaflet";
 import {
     Slider,
@@ -7,8 +7,17 @@ import {
     SliderThumb,
     SliderMark,
 } from '@chakra-ui/react'
+// Hooks
+import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+// Icons
 import { BiRadar } from 'react-icons/bi'
+import { SearchIcon } from "@chakra-ui/icons";
+// JS files
 import Calques from "./Calques";
+import AddMarker from "./AddMarker";
+import LocationMarker from "./LocationMarker";
+// JSON files
 import zonesBioJSON from './jsons/greenZonesTarnFull.json'
 import rivieresJSON from './jsons/riversDataTarn.json'
 import fermesBioJSON from './jsons/farmsData.json'
@@ -19,10 +28,9 @@ import pollusolPointsOccitanieJSON from './jsons/pollusolPointsOccitanie.json'
 import pollusolOccitanieJSON from './jsons/pollusolOccitanie.json'
 import eoliennesOccitanieJSON from './jsons/eoliennesOccitanie.json'
 import eoliennesJSON from './jsons/eoliennes.json'
-import { useEffect, useRef, useState } from "react";
+
+// Leaflet
 import * as L from "leaflet";
-import AddMarker from "./AddMarker";
-import { useNavigate } from "react-router-dom";
 
 const zonesBio = zonesBioJSON.data;
 const rivieres = rivieresJSON.data;
@@ -138,7 +146,7 @@ const Map = () => {
 
     return (
         <>
-            <Stack id="mappage" direction={['column','row']} h={'100vh'}>
+            <Stack id="mappage" direction={['column', 'row']} h={'100vh'}>
                 <MapContainer preferCanvas={true} style={{ zIndex: 1, height: '100vh', width: '100%' }} center={[43.606214, 2.241295]} zoom={13} scrollWheelZoom={true}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -157,40 +165,48 @@ const Map = () => {
                     {display.eoliennes && <GeoJSON data={onlyTarn ? eoliennes : eoliennesOccitanie} pointToLayer={customMarkerEoliennes} onEachFeature={onEachEolienne}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
+                    <LocationMarker/>
                 </MapContainer>
 
 
-                <Stack ml={'0px !important'} w={['100%','xl']} zIndex={2} overflowY='auto'>
+                <Stack ml={'0px !important'} w={['100%', 'xl']} zIndex={2} overflowY='auto'>
                     <Stack bg={'green.500'} p={'8'}>
                         <Heading color={'white'} cursor={'pointer'} onClick={() => navigate('/')} fontWeight={'black'}>GeoBeeo</Heading>
                     </Stack>
                     <Stack p={'8'} gap={4}>
-                        <Stack gap={2}>
-                            <Heading fontSize={'lg'}>Marqueurs</Heading>
-                            <Stack>
-                                <Text fontSize={'sm'}>{placementActivated ? 'Cliquez' : 'Activez la pose des marqueurs et cliquez'} sur la carte pour poser un marqueur de <Code fontFamily={'body'} colorScheme={'green'}>{userMarkersRadius}</Code>m de rayon</Text>
-                                <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'green'}>
-                                    <SliderTrack>
-                                        <SliderFilledTrack />
-                                    </SliderTrack>
-                                    <SliderThumb boxSize={6}>
-                                        <Icon as={BiRadar} />
-                                    </SliderThumb>
-                                </Slider>
-                            </Stack>
-                            <Stack direction={'row'}>
-                                <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
-                                    {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
-                                </Button>
-                            </Stack>
+                    <InputGroup>
+                        <InputLeftElement
+                            pointerEvents='none'
+                            children={<SearchIcon color='gray.300' />}
+                        />
+                        <Input focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher' />
+                    </InputGroup>
+                    <Stack gap={2}>
+                        <Heading fontSize={'lg'}>Marqueurs</Heading>
+                        <Stack>
+                            <Text fontSize={'sm'}>{placementActivated ? 'Cliquez' : 'Activez la pose des marqueurs et cliquez'} sur la carte pour poser un marqueur de <Code fontFamily={'body'} colorScheme={'green'}>{userMarkersRadius}</Code>m de rayon</Text>
+                            <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'green'}>
+                                <SliderTrack>
+                                    <SliderFilledTrack />
+                                </SliderTrack>
+                                <SliderThumb boxSize={6}>
+                                    <Icon as={BiRadar} />
+                                </SliderThumb>
+                            </Slider>
                         </Stack>
-                        <Divider borderColor={'gray.400'}></Divider>
-                        <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                        <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
+                        <Stack direction={'row'}>
+                            <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
+                                {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
+                            </Button>
+                        </Stack>
                     </Stack>
+                    <Divider borderColor={'gray.400'}></Divider>
+                    <Heading fontSize={'lg'}>Sélection des calques</Heading>
+                    <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
                 </Stack>
-
             </Stack>
+
+        </Stack>
         </>
     )
 }

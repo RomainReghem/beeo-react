@@ -8,7 +8,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn }) => {
                 <option value='tarn'>Tarn</option>
                 <option value='occitanie'>Occitanie</option>
             </Select>
-            <Accordion allowMultiple>
+            <Accordion defaultIndex={[]} allowMultiple>
                 {/* Zones Bio */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
