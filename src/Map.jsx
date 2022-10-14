@@ -17,6 +17,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import Calques from "./Calques";
 import AddMarker from "./AddMarker";
 import LocationMarker from "./LocationMarker";
+import SearchField from './SearchField'
 // JSON files
 import zonesBioJSON from './jsons/greenZonesTarnFull.json'
 import rivieresJSON from './jsons/riversDataTarn.json'
@@ -148,11 +149,11 @@ const Map = () => {
         <>
             <Stack id="mappage" direction={['column', 'row']} h={'100vh'}>
                 <MapContainer preferCanvas={true} style={{ zIndex: 1, height: '100vh', width: '100%' }} center={[43.606214, 2.241295]} zoom={13} scrollWheelZoom={true}>
+                    <SearchField />
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-
                     {display.zonesBio && <GeoJSON data={zonesBio} color='green' onEachFeature={onEachZoneBio}></GeoJSON>}
                     {display.rivieres && <GeoJSON data={rivieres} pointToLayer={customMarkerRiviere} onEachFeature={onEachRiviere}></GeoJSON>}
                     {display.fermesBio && <GeoJSON data={fermesBio} pointToLayer={customMarkerFermeBio} onEachFeature={onEachFermeBio}></GeoJSON>}
@@ -165,7 +166,7 @@ const Map = () => {
                     {display.eoliennes && <GeoJSON data={onlyTarn ? eoliennes : eoliennesOccitanie} pointToLayer={customMarkerEoliennes} onEachFeature={onEachEolienne}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
-                    <LocationMarker/>
+                    <LocationMarker />
                 </MapContainer>
 
 
@@ -174,39 +175,39 @@ const Map = () => {
                         <Heading color={'white'} cursor={'pointer'} onClick={() => navigate('/')} fontWeight={'black'}>GeoBeeo</Heading>
                     </Stack>
                     <Stack p={'8'} gap={4}>
-                    <InputGroup>
-                        <InputLeftElement
-                            pointerEvents='none'
-                            children={<SearchIcon color='gray.300' />}
-                        />
-                        <Input focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher' />
-                    </InputGroup>
-                    <Stack gap={2}>
-                        <Heading fontSize={'lg'}>Marqueurs</Heading>
-                        <Stack>
-                            <Text fontSize={'sm'}>{placementActivated ? 'Cliquez' : 'Activez la pose des marqueurs et cliquez'} sur la carte pour poser un marqueur de <Code fontFamily={'body'} colorScheme={'green'}>{userMarkersRadius}</Code>m de rayon</Text>
-                            <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'green'}>
-                                <SliderTrack>
-                                    <SliderFilledTrack />
-                                </SliderTrack>
-                                <SliderThumb boxSize={6}>
-                                    <Icon as={BiRadar} />
-                                </SliderThumb>
-                            </Slider>
+                        <InputGroup>
+                            <InputLeftElement
+                                pointerEvents='none'
+                                children={<SearchIcon color='gray.300' />}
+                            />
+                            <Input focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans un calque' />
+                        </InputGroup>
+                        <Stack gap={2}>
+                            <Heading fontSize={'lg'}>Marqueurs</Heading>
+                            <Stack>
+                                <Text fontSize={'sm'}>{placementActivated ? 'Cliquez' : 'Activez la pose des marqueurs et cliquez'} sur la carte pour poser un marqueur de <Code fontFamily={'body'} colorScheme={'green'}>{userMarkersRadius}</Code>m de rayon</Text>
+                                <Slider defaultValue={3000} min={500} max={6000} step={100} onChange={(val) => { setUserMarkersRadius(val) }} colorScheme={'green'}>
+                                    <SliderTrack>
+                                        <SliderFilledTrack />
+                                    </SliderTrack>
+                                    <SliderThumb boxSize={6}>
+                                        <Icon as={BiRadar} />
+                                    </SliderThumb>
+                                </Slider>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
+                                    {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
+                                </Button>
+                            </Stack>
                         </Stack>
-                        <Stack direction={'row'}>
-                            <Button size={'sm'} onClick={() => setPlacementActivated(curr => !curr)} variant={placementActivated ? 'outline' : 'solid'} colorScheme={'green'}>
-                                {placementActivated ? 'Bloquer la pose de marqueurs' : 'Activer la pose de marqueurs'}
-                            </Button>
-                        </Stack>
+                        <Divider borderColor={'gray.400'}></Divider>
+                        <Heading fontSize={'lg'}>Sélection des calques</Heading>
+                        <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
                     </Stack>
-                    <Divider borderColor={'gray.400'}></Divider>
-                    <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                    <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
                 </Stack>
-            </Stack>
 
-        </Stack>
+            </Stack>
         </>
     )
 }
