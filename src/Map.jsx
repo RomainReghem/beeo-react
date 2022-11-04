@@ -1,4 +1,4 @@
-import { Box, Button, Code, Divider, Heading, Icon, IconButton, Input, InputGroup, InputLeftElement, Stack, Switch, Text } from "@chakra-ui/react"
+import { Badge, Box, Button, Code, Divider, Heading, Icon, IconButton, Input, InputGroup, InputLeftElement, Stack, Switch, Text } from "@chakra-ui/react"
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon, GeoJSON, LayerGroup, useMapEvents } from "react-leaflet";
 import {
     Slider,
@@ -7,6 +7,7 @@ import {
     SliderThumb,
     SliderMark,
 } from '@chakra-ui/react'
+import axios from "./api/axios";
 // Hooks
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +19,7 @@ import Calques from "./Calques";
 import AddMarker from "./AddMarker";
 import LocationMarker from "./LocationMarker";
 import SearchField from './SearchField'
+import Flyer from "./Flyer";
 // JSON files
 import zonesBioJSON from './jsons/greenZonesTarnFull.json'
 import rivieresJSON from './jsons/riversDataTarn.json'
@@ -40,7 +42,6 @@ const pollusol = pollusolJSON.data;
 const pollusolPoints = pollusolPointsJSON.data;
 const pollusolPointsOccitanie = pollusolPointsOccitanieJSON.data;
 const pollusolOccitanie = pollusolOccitanieJSON.data;
-const zonesIndus = zonesIndusJSON.data;
 const eoliennesOccitanie = eoliennesOccitanieJSON.data;
 const eoliennes = eoliennesJSON.data;
 const fermesBioIcon = new L.Icon({
@@ -63,6 +64,10 @@ const eoliennesIcon = new L.Icon({
     iconUrl: '/wind.png',
     iconSize: [36, 42]
 })
+
+let layers_data = {
+    indus: {}
+}
 
 const calculateRiverNote = (note) => {
     let toR = ''
@@ -90,7 +95,7 @@ const onEachPollusol = (feature, layer) => {
 }
 
 const onEachZoneIndus = (feature, layer) => {
-    layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
+    layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Entreprise:" + feature.properties.nom_ets + "</p><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
 }
 
 const onEachEolienne = (feature, layer) => {
@@ -117,6 +122,14 @@ const customMarkerEoliennes = (feature, latlng) => {
     return L.marker(latlng, { icon: eoliennesIcon })
 }
 
+const eq_table = {
+    indus: {
+        icon: zonesIndusIcon,
+        display: 'nom_ets',
+        color: 'red'
+    }
+}
+
 const Map = () => {
     const navigate = useNavigate()
     const [display, setDisplay] = useState({
@@ -127,6 +140,29 @@ const Map = () => {
         indus: false,
         eoliennes: false,
     })
+    const [searchContent, setSearchContent] = useState('')
+    const [searchResponse, setSearchResponse] = useState([])
+    const [to, setTo] = useState()
+
+    const getData = async (layer, checked) => {
+        if (checked) {
+            layers_data[layer] = (await axios.get('/layers', { params: { layer: layer } })).data
+            console.log(layers_data[layer])
+            setDisplay(curr => ({ ...curr, [layer]: true }))
+        } else setDisplay(curr => ({ ...curr, [layer]: false }))
+    }
+
+    const search = async () => {
+        const response = await axios.get('/search', { params: { content: searchContent.toLowerCase() } })
+        setSearchResponse(response.data)
+        console.log(response.data)
+    }
+
+    useEffect(() => {
+        if (searchContent.length > 2) {
+            search()
+        } else setSearchResponse([])
+    }, [searchContent])
 
     // By default, only Tarn region.
     const [onlyTarn, setOnlyTarn] = useState(true)
@@ -157,7 +193,7 @@ const Map = () => {
                     {display.zonesBio && <GeoJSON data={zonesBio} color='green' onEachFeature={onEachZoneBio}></GeoJSON>}
                     {display.rivieres && <GeoJSON data={rivieres} pointToLayer={customMarkerRiviere} onEachFeature={onEachRiviere}></GeoJSON>}
                     {display.fermesBio && <GeoJSON data={fermesBio} pointToLayer={customMarkerFermeBio} onEachFeature={onEachFermeBio}></GeoJSON>}
-                    {display.indus && <GeoJSON data={zonesIndus} pointToLayer={customMarkerZonesIndus} onEachFeature={onEachZoneIndus}></GeoJSON>}
+                    {display.indus && <GeoJSON data={layers_data.indus} pointToLayer={customMarkerZonesIndus} onEachFeature={onEachZoneIndus}></GeoJSON>}
                     {
                         display.pollusol && <> <GeoJSON data={onlyTarn ? pollusol : pollusolOccitanie} color='red' onEachFeature={onEachPollusol}></GeoJSON>
                             <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={customMarkerPollusol} onEachFeature={onEachPollusol}></GeoJSON>
@@ -167,6 +203,7 @@ const Map = () => {
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                     <LocationMarker />
+                    <Flyer to={to} />
                 </MapContainer>
 
 
@@ -175,13 +212,35 @@ const Map = () => {
                         <Heading color={'white'} cursor={'pointer'} onClick={() => navigate('/')} fontWeight={'black'}>GeoBeeo</Heading>
                     </Stack>
                     <Stack p={'8'} gap={4}>
-                        <InputGroup>
-                            <InputLeftElement
-                                pointerEvents='none'
-                                children={<SearchIcon color='gray.300' />}
-                            />
-                            <Input focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans un calque' />
-                        </InputGroup>
+                        <Stack>
+                            <InputGroup>
+                                <InputLeftElement
+                                    pointerEvents='none'
+                                    children={<SearchIcon color='gray.300' />}
+                                />
+                                <Input onChange={(e) => setSearchContent(e.target.value)} focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans un calque' />
+                            </InputGroup>
+                            {Object.keys(searchResponse).length && <Stack marginTop={'0px !important'} p='2' border={'1px solid'} borderColor='gray.200' borderTop={'none'} roundedBottom='sm' maxH='100px' overflowY={'scroll'}>
+                                {
+                                    Object.keys(searchResponse).map(layer => {
+                                        return searchResponse[layer].map(line => {
+                                            return (
+                                                <>
+                                                    <Stack direction={'row'} align='center'
+                                                        onClick={() => {                                                            
+                                                            getData(layer, true);
+                                                            setTo([line.st_asgeojson.coordinates[1], line.st_asgeojson.coordinates[0]])}}
+                                                        cursor='pointer'>
+                                                        <Badge colorScheme={[eq_table[layer].color]} textTransform={'none'}>Indus</Badge>
+                                                        <Text textTransform={'lowercase'}>{line[eq_table[layer].display]}</Text>
+                                                    </Stack>
+                                                </>
+                                            )
+                                        })
+                                    })
+                                }
+                            </Stack>}
+                        </Stack>
                         <Stack gap={2}>
                             <Heading fontSize={'lg'}>Marqueurs</Heading>
                             <Stack>
@@ -203,7 +262,7 @@ const Map = () => {
                         </Stack>
                         <Divider borderColor={'gray.400'}></Divider>
                         <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                        <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} />
+                        <Calques display={display} setDisplay={setDisplay} setOnlyTarn={setOnlyTarn} getData={getData} />
                     </Stack>
                 </Stack>
 

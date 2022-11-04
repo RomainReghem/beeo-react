@@ -1,7 +1,7 @@
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Heading, Link, Select, Stack, Switch, Text } from "@chakra-ui/react";
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-const Calques = ({ display, setDisplay, setOnlyTarn }) => {
+const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
     return (
         <Stack gap={2}>
             <Select onChange={(e) => setOnlyTarn(curr => !curr)} rounded='sm' focusBorderColor={'bee.500'} size={'md'}>
@@ -72,7 +72,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn }) => {
                 {/* Indus */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.indus} onChange={(e) => setDisplay(curr => ({ ...curr, indus: e.target.checked }))} colorScheme='bee' />
+                        <Switch onChange={(e) => getData('indus', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Installations industrielles
