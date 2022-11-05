@@ -12,7 +12,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Zones Bio */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.zonesBio} onChange={(e) => setDisplay(curr => ({ ...curr, zonesBio: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.zonesBio} onChange={(e) => setDisplay(curr => ({ ...curr, zbio: e.target.checked }))} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Zones bios
@@ -32,7 +32,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Fermes bio */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.fermesBio} onChange={(e) => setDisplay(curr => ({ ...curr, fermesBio: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.fermesBio} onChange={(e) => setDisplay(curr => ({ ...curr, fbio: e.target.checked }))} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Fermes bio
@@ -52,7 +52,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Pollusol */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.pollusol} onChange={(e) => setDisplay(curr => ({ ...curr, pollusol: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.pollusol} onChange={(e) => setDisplay(curr => ({ ...curr, pollu: e.target.checked }))} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Zones polluées
@@ -92,7 +92,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Rivières */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.rivieres} onChange={(e) => setDisplay(curr => ({ ...curr, rivieres: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.rivieres} onChange={(e) => setDisplay(curr => ({ ...curr, riv: e.target.checked }))} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Qualité des rivières
@@ -112,7 +112,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Eoliennes */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.eoliennes} onChange={(e) => setDisplay(curr => ({ ...curr, eoliennes: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.eoliennes} onChange={(e) => setDisplay(curr => ({ ...curr, eol: e.target.checked }))} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Eoliennes

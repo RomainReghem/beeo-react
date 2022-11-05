@@ -44,30 +44,6 @@ const pollusolPointsOccitanie = pollusolPointsOccitanieJSON.data;
 const pollusolOccitanie = pollusolOccitanieJSON.data;
 const eoliennesOccitanie = eoliennesOccitanieJSON.data;
 const eoliennes = eoliennesJSON.data;
-const fermesBioIcon = new L.Icon({
-    iconUrl: '/farm.png',
-    iconSize: [36, 42]
-})
-const rivieresIcon = new L.Icon({
-    iconUrl: '/river.png',
-    iconSize: [36, 42]
-})
-const pollusolIcon = new L.Icon({
-    iconUrl: '/pollu.png',
-    iconSize: [36, 42]
-})
-const zonesIndusIcon = new L.Icon({
-    iconUrl: '/indus.png',
-    iconSize: [36, 42]
-})
-const eoliennesIcon = new L.Icon({
-    iconUrl: '/wind.png',
-    iconSize: [36, 42]
-})
-
-let layers_data = {
-    indus: {}
-}
 
 const calculateRiverNote = (note) => {
     let toR = ''
@@ -78,78 +54,69 @@ const calculateRiverNote = (note) => {
     return toR
 }
 
-const onEachZoneBio = (feature, layer) => {
-    layer.bindPopup("<center><h1>Exploitation biologique</h1><img style='width:100%;'src='/bio.jpeg'/><p>Type de culture :" + feature.properties.LBL_CULTU + "</p><p>Surface : " + feature.properties?.SURFACE_HA + " hectares</p></center>");
-}
-
-const onEachFermeBio = (feature, layer) => {
-    layer.bindPopup("<center><h1>Ferme</h1><img style='width:50%;'src='/farm1.png'/><p>Nom : " + feature.properties.Nom + "</p><p>Ville " + feature.properties.Ville + "<p> Adresse: " + feature.properties.Address + "</p>" + "<p> Produits: " + feature.properties.Produits + "</p>" + "</p><a target=_blank href='" + feature.properties.Location + "'>lien maps<a></center>");
-}
-
-const onEachRiviere = (feature, layer) => {
-    layer.bindPopup("<center><h1>Rivière</h1><img style='width:50%;'src='/river1.png'/><p>Libelle : " + feature.properties.Libelle + "</p><p>Commune:  " + feature.properties.Commune + "<p> Localisation: " + feature.properties.Localisation + "</p>" + "<p> Resultat: " + feature.properties.Resultat + "  " + calculateRiverNote(feature.properties.Resultat) + "</p>" + "<p> <a href='http://adour-garonne.eaufrance.fr'>Ressource</a></p>");
-}
-
-const onEachPollusol = (feature, layer) => {
-    layer.bindPopup("<center><h1>Zone polluée</h1><img style='width:100%;'src='/pollu1.png'/><p>Description : " + feature.properties.descript + "</p></center>");
-}
-
-const onEachZoneIndus = (feature, layer) => {
-    layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Entreprise:" + feature.properties.nom_ets + "</p><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
-}
-
-const onEachEolienne = (feature, layer) => {
-    layer.bindPopup("<center><h1>Eolienne</h1></center>");
-}
-
-const customMarkerFermeBio = (feature, latlng) => {
-    return L.marker(latlng, { icon: fermesBioIcon })
-}
-
-const customMarkerRiviere = (feature, latlng) => {
-    return L.marker(latlng, { icon: rivieresIcon })
-}
-
-const customMarkerPollusol = (feature, latlng) => {
-    return L.marker(latlng, { icon: pollusolIcon })
-}
-
-const customMarkerZonesIndus = (feature, latlng) => {
-    return L.marker(latlng, { icon: zonesIndusIcon })
-}
-
-const customMarkerEoliennes = (feature, latlng) => {
-    return L.marker(latlng, { icon: eoliennesIcon })
-}
-
-const eq_table = {
-    indus: {
-        icon: zonesIndusIcon,
-        display: 'nom_ets',
-        color: 'red'
+const onEach = (feature, layer, type) => {
+    switch (type) {
+        case 'riv': layer.bindPopup("<center><h1>Rivière</h1><img style='width:50%;'src='/river1.png'/><p>Libelle : " + feature.properties.Libelle + "</p><p>Commune:  " + feature.properties.Commune + "<p> Localisation: " + feature.properties.Localisation + "</p>" + "<p> Resultat: " + feature.properties.Resultat + "  " + calculateRiverNote(feature.properties.Resultat) + "</p>" + "<p> <a href='http://adour-garonne.eaufrance.fr'>Ressource</a></p>");
+            break;
+        case 'zbio': layer.bindPopup("<center><h1>Exploitation biologique</h1><img style='width:100%;'src='/bio.jpeg'/><p>Type de culture :" + feature.properties.LBL_CULTU + "</p><p>Surface : " + feature.properties?.SURFACE_HA + " hectares</p></center>");
+            break;
+        case 'fbio': layer.bindPopup("<center><h1>Ferme</h1><img style='width:50%;'src='/farm1.png'/><p>Nom : " + feature.properties.Nom + "</p><p>Ville " + feature.properties.Ville + "<p> Adresse: " + feature.properties.Address + "</p>" + "<p> Produits: " + feature.properties.Produits + "</p>" + "</p><a target=_blank href='" + feature.properties.Location + "'>lien maps<a></center>");
+            break;
+        case 'pollu': layer.bindPopup("<center><h1>Zone polluée</h1><img style='width:100%;'src='/pollu1.png'/><p>Description : " + feature.properties.descript + "</p></center>");
+            break;
+        case 'indus': layer.bindPopup("<center><h1>Installation industrielle</h1><img style='width:50%;'src='/indus1.png'/><p>Entreprise:" + feature.properties.nom_ets + "</p><p>Type d'industrie : " + feature.properties.lib_naf + "</p><p>Seveso : " + feature.properties.lib_seveso + "</p><a target=_blank href='" + feature.properties.url_fiche + "'>Cliquer pour plus d'infos<a></center>");
+            break;
+        case 'eol': layer.bindPopup("<center><h1>Eolienne</h1></center>");
+            break;
     }
+}
+
+const customMarker = (e, icon) => {
+    let latlng = [e.geometry.coordinates[1], e.geometry.coordinates[0]]
+    return L.marker(latlng, { icon: icon })
+}
+
+// Data recovered from API
+let layers_data = {
+    indus: {}, fbio:{}, zbio: {}, riv: {}, pollu: {}, eol: {}, one: {}
+}
+
+// Infos about the layers
+const eq_table = {
+    zbio: { display: '', color: 'green.500', },
+    fbio: { display: '', color: 'green', icon: new L.Icon({ iconUrl: '/farm.png', iconSize: [36, 42] }) },
+    indus: { display: 'nom_ets', color: 'red', icon: new L.Icon({ iconUrl: '/indus.png', iconSize: [36, 42] }) },
+    riv: { display: '', color: 'blue', icon: new L.Icon({ iconUrl: '/river.png', iconSize: [36, 42] }) },
+    pollu: { display: '', color: 'red', icon: new L.Icon({ iconUrl: '/pollu.png', iconSize: [36, 42] }) },
+    eol: { display: '', color: 'red', icon: new L.Icon({ iconUrl: '/wind.png', iconSize: [36, 42] }) },
 }
 
 const Map = () => {
     const navigate = useNavigate()
-    const [display, setDisplay] = useState({
-        zonesBio: false,
-        fermesBio: false,
-        rivieres: false,
-        pollusol: false,
-        indus: false,
-        eoliennes: false,
-    })
     const [searchContent, setSearchContent] = useState('')
     const [searchResponse, setSearchResponse] = useState([])
     const [to, setTo] = useState()
+    const [display, setDisplay] = useState({
+        zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false, one: false,
+    })
 
     const getData = async (layer, checked) => {
         if (checked) {
-            layers_data[layer] = (await axios.get('/layers', { params: { layer: layer } })).data
-            console.log(layers_data[layer])
+            // We check if the object is empty. If it is, then we query the database, else we can just display the data.
+            if (Object.keys(layers_data[layer]).length === 0) {
+                layers_data[layer] = (await axios.get('/layers', { params: { layer: layer } })).data
+            }
+            console.log('hi')
             setDisplay(curr => ({ ...curr, [layer]: true }))
         } else setDisplay(curr => ({ ...curr, [layer]: false }))
+    }
+
+    const getOne = async (layer, id) => {
+        setDisplay(curr => ({ ...curr, one: false }))
+        layers_data.one = (await axios.get('/one', { params: { layer: layer, gid: id } })).data
+        layers_data.one.layerName = layer
+        console.log(layers_data)
+        setDisplay(curr => ({ ...curr, one: true }))
     }
 
     const search = async () => {
@@ -169,12 +136,7 @@ const Map = () => {
 
     useEffect(() => {
         setDisplay({
-            zonesBio: false,
-            fermesBio: false,
-            rivieres: false,
-            pollusol: false,
-            indus: false,
-            eoliennes: false,
+            zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false,
         })
     }, [onlyTarn])
 
@@ -190,16 +152,17 @@ const Map = () => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {display.zonesBio && <GeoJSON data={zonesBio} color='green' onEachFeature={onEachZoneBio}></GeoJSON>}
-                    {display.rivieres && <GeoJSON data={rivieres} pointToLayer={customMarkerRiviere} onEachFeature={onEachRiviere}></GeoJSON>}
-                    {display.fermesBio && <GeoJSON data={fermesBio} pointToLayer={customMarkerFermeBio} onEachFeature={onEachFermeBio}></GeoJSON>}
-                    {display.indus && <GeoJSON data={layers_data.indus} pointToLayer={customMarkerZonesIndus} onEachFeature={onEachZoneIndus}></GeoJSON>}
+                    {display.zbio && <GeoJSON data={zonesBio} color='green' onEachFeature={(f, l) => onEach(f, l, 'zbio')}></GeoJSON>}
+                    {display.riv && <GeoJSON data={rivieres} pointToLayer={(e) => customMarker(e, eq_table.riv.icon)} onEachFeature={(f, l) => onEach(f, l, 'riv')}></GeoJSON>}
+                    {display.fbio && <GeoJSON data={fermesBio} pointToLayer={(e) => customMarker(e, eq_table.fbio.icon)} onEachFeature={(f, l) => onEach(f, l, 'fbio')}></GeoJSON>}
+                    {display.indus && <GeoJSON data={layers_data.indus} pointToLayer={(e) => customMarker(e, eq_table.indus.icon)} onEachFeature={(f, l) => onEach(f, l, 'indus')}></GeoJSON>}
+                    {display.one && <GeoJSON data={layers_data.one} pointToLayer={(e) => customMarker(e, eq_table[layers_data.one.layerName].icon)} onEachFeature={(f, l) => onEach(f, l, layers_data.one.layerName)}></GeoJSON>}
                     {
-                        display.pollusol && <> <GeoJSON data={onlyTarn ? pollusol : pollusolOccitanie} color='red' onEachFeature={onEachPollusol}></GeoJSON>
-                            <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={customMarkerPollusol} onEachFeature={onEachPollusol}></GeoJSON>
+                        display.pollu && <> <GeoJSON data={onlyTarn ? pollusol : pollusolOccitanie} color='red' onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON>
+                            <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON>
                         </>
                     }
-                    {display.eoliennes && <GeoJSON data={onlyTarn ? eoliennes : eoliennesOccitanie} pointToLayer={customMarkerEoliennes} onEachFeature={onEachEolienne}></GeoJSON>}
+                    {display.eol && <GeoJSON data={onlyTarn ? eoliennes : eoliennesOccitanie} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                     <LocationMarker />
@@ -218,7 +181,7 @@ const Map = () => {
                                     pointerEvents='none'
                                     children={<SearchIcon color='gray.300' />}
                                 />
-                                <Input onChange={(e) => setSearchContent(e.target.value)} focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans un calque' />
+                                <Input onChange={(e) => setSearchContent(e.target.value)} focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans les calques' />
                             </InputGroup>
                             {Object.keys(searchResponse).length && <Stack marginTop={'0px !important'} p='2' border={'1px solid'} borderColor='gray.200' borderTop={'none'} roundedBottom='sm' maxH='100px' overflowY={'scroll'}>
                                 {
@@ -227,11 +190,12 @@ const Map = () => {
                                             return (
                                                 <>
                                                     <Stack direction={'row'} align='center'
-                                                        onClick={() => {                                                            
-                                                            getData(layer, true);
-                                                            setTo([line.st_asgeojson.coordinates[1], line.st_asgeojson.coordinates[0]])}}
+                                                        onClick={() => {
+                                                            getOne(layer, line.gid);
+                                                            setTo([line.st_asgeojson.coordinates[1], line.st_asgeojson.coordinates[0]])
+                                                        }}
                                                         cursor='pointer'>
-                                                        <Badge colorScheme={[eq_table[layer].color]} textTransform={'none'}>Indus</Badge>
+                                                        <Badge colorScheme={[eq_table[layer].color]} textTransform={'none'}>{layer}</Badge>
                                                         <Text textTransform={'lowercase'}>{line[eq_table[layer].display]}</Text>
                                                     </Stack>
                                                 </>
