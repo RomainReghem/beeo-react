@@ -1,18 +1,30 @@
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Heading, Link, Select, Stack, Switch, Text } from "@chakra-ui/react";
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
+const Calques = ({ display, setDisplay, setDpt, getData }) => {
     return (
         <Stack gap={2}>
-            <Select onChange={(e) => setOnlyTarn(curr => !curr)} rounded='sm' focusBorderColor={'bee.500'} size={'md'}>
-                <option value='tarn'>Tarn</option>
-                <option value='occitanie'>Occitanie</option>
+            <Select onChange={(e) => setDpt(e.target.value)} rounded='sm' focusBorderColor={'bee.500'} size={'md'}>
+                <option value='81'>Tarn</option>
+                <option value='1'>Occitanie</option>
+                <option value='09'>Ariège</option>
+                <option value='11'>Aude</option>
+                <option value='12'>Aveyron</option>
+                <option value='30'>Gard</option>
+                <option value='31'>Haute-Garonne</option>
+                <option value='32'>Gers</option>
+                <option value='34'>Hérault</option>
+                <option value='46'>Lot</option>
+                <option value='48'>Lozère</option>
+                <option value='65'>Hautes-Pyrénées</option>
+                <option value='66'>Pyrénées-Orientales</option>
+                <option value='82'>Tarn-et-Garonne</option>
             </Select>
             <Accordion defaultIndex={[]} allowMultiple>
                 {/* Zones Bio */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.zonesBio} onChange={(e) => setDisplay(curr => ({ ...curr, zbio: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.zbio} onChange={(e) => getData('zbio', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Zones bios
@@ -32,7 +44,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Fermes bio */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.fermesBio} onChange={(e) => setDisplay(curr => ({ ...curr, fbio: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.fbio} onChange={(e) => getData('fbio', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Fermes bio
@@ -52,7 +64,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Pollusol */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.pollusol} onChange={(e) => setDisplay(curr => ({ ...curr, pollu: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.pollu} onChange={(e) => getData('pollu', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Zones polluées
@@ -72,7 +84,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Indus */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch onChange={(e) => getData('indus', e.target.checked)} colorScheme='bee' />
+                        <Switch isChecked={display.indus} onChange={(e) => getData('indus', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Installations industrielles
@@ -92,7 +104,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Rivières */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.rivieres} onChange={(e) => setDisplay(curr => ({ ...curr, riv: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.riv} onChange={(e) => getData('riv', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Qualité des rivières
@@ -112,7 +124,7 @@ const Calques = ({ display, setDisplay, setOnlyTarn, getData }) => {
                 {/* Eoliennes */}
                 <AccordionItem border={'0px'}>
                     <Stack align={'center'} direction={'row'}>
-                        <Switch isChecked={display.eoliennes} onChange={(e) => setDisplay(curr => ({ ...curr, eol: e.target.checked }))} colorScheme='bee' />
+                        <Switch isChecked={display.eol} onChange={(e) => getData('eol', e.target.checked)} colorScheme='bee' />
                         <Heading>
                             <AccordionButton>
                                 Eoliennes

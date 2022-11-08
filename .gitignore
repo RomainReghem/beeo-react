@@ -9,6 +9,7 @@ lerna-debug.log*
 
 .env
 
+SHP Files
 node_modules
 dist
 dist-ssr
