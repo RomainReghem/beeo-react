@@ -21,8 +21,13 @@ import LocationMarker from "./LocationMarker";
 import SearchField from './SearchField'
 import Flyer from "./Flyer";
 
+import test from "./jsons/test_data.json"
+const test_data = test.data
+
 // Leaflet
 import * as L from "leaflet";
+
+// CHECK LEAFLET GLIFY
 
 const calculateRiverNote = (note) => {
     let toR = ''
@@ -75,6 +80,7 @@ const Map = () => {
     const [searchContent, setSearchContent] = useState('')
     const [searchResponse, setSearchResponse] = useState([])
     const [to, setTo] = useState()
+    const [bounds, setBounds] = useState()
     const [display, setDisplay] = useState({
         zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false, one: false,
     })
@@ -83,9 +89,9 @@ const Map = () => {
         if (checked) {
             // We check if the object is empty. If it is, then we query the database, else we can just display the data.
             console.log(typeof dpt)
-            if (Object.keys(layers_data[layer]).length === 0) {
-                layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt:dpt } })).data
-            }            
+            // if (Object.keys(layers_data[layer]).length === 0) {
+                layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt:dpt, bounds:bounds } })).data
+            // }            
             setDisplay(curr => ({ ...curr, [layer]: true }))
         } else setDisplay(curr => ({ ...curr, [layer]: false }))
     }
@@ -133,21 +139,21 @@ const Map = () => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {display.zbio && <GeoJSON data={layers_data.zbio} color='green' onEachFeature={(f, l) => onEach(f, l, 'zbio')}></GeoJSON>}
-                    {display.riv && <GeoJSON data={layers_data.riv} pointToLayer={(e) => customMarker(e, eq_table.riv.icon)} onEachFeature={(f, l) => onEach(f, l, 'riv')}></GeoJSON>}
-                    {display.fbio && <GeoJSON data={layers_data.fbio} pointToLayer={(e) => customMarker(e, eq_table.fbio.icon)} onEachFeature={(f, l) => onEach(f, l, 'fbio')}></GeoJSON>}
-                    {display.indus && <GeoJSON data={layers_data.indus} pointToLayer={(e) => customMarker(e, eq_table.indus.icon)} onEachFeature={(f, l) => onEach(f, l, 'indus')}></GeoJSON>}
-                    {display.one && <GeoJSON data={layers_data.one} pointToLayer={(e) => customMarker(e, eq_table[layers_data.one.layerName].icon)} onEachFeature={(f, l) => onEach(f, l, layers_data.one.layerName)}></GeoJSON>}
+                    {display.zbio && Object.keys(layers_data.zbio).length > 0 && <GeoJSON data={layers_data.zbio} color='green' onEachFeature={(f, l) => onEach(f, l, 'zbio')}></GeoJSON>}
+                    {display.riv && Object.keys(layers_data.riv).length > 0 && <GeoJSON data={layers_data.riv} pointToLayer={(e) => customMarker(e, eq_table.riv.icon)} onEachFeature={(f, l) => onEach(f, l, 'riv')}></GeoJSON>}
+                    {display.fbio && Object.keys(layers_data.fbio).length > 0 && <GeoJSON data={layers_data.fbio} pointToLayer={(e) => customMarker(e, eq_table.fbio.icon)} onEachFeature={(f, l) => onEach(f, l, 'fbio')}></GeoJSON>}
+                    {display.indus && Object.keys(layers_data.indus).length > 0 && <GeoJSON data={layers_data.indus} pointToLayer={(e) => customMarker(e, eq_table.indus.icon)} onEachFeature={(f, l) => onEach(f, l, 'indus')}></GeoJSON>}
+                    {display.one && Object.keys(layers_data.one).length > 0 && <GeoJSON data={layers_data.one} pointToLayer={(e) => customMarker(e, eq_table[layers_data.one.layerName].icon)} onEachFeature={(f, l) => onEach(f, l, layers_data.one.layerName)}></GeoJSON>}
                     {
                         display.pollu && <> <GeoJSON data={layers_data.pollu} color='red' pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON>
                             {/* <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON> */}
                         </>
                     }
-                    {display.eol && <GeoJSON data={layers_data.eol} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
+                    {display.eol && Object.keys(layers_data.zbio).length > 0 && <GeoJSON data={layers_data.eol} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                     <LocationMarker />
-                    <Flyer to={to} />
+                    <Flyer to={to} setBounds={setBounds} />
                 </MapContainer>
 
 
