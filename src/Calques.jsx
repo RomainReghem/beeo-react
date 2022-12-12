@@ -1,7 +1,15 @@
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Heading, Link, Select, Stack, Switch, Text } from "@chakra-ui/react";
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Badge, Heading, Highlight, Link, Select, Stack, Switch, Text } from "@chakra-ui/react";
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-const Calques = ({ display, setDisplay, setDpt, getData }) => {
+const Calques = ({ display, setDisplay, setDpt, dpt, getData }) => {
+
+    const dpt_table = { 
+        zbio: ['81'],
+        eol: ['30', '34', '11', '66', '12'],
+        pollu:['46', '34', '12', '32', '11', '31', '09', '82', '48', '30', '66', '81', '65'],
+        inci:['34', '31', '82', '30', '66'],
+    }
+
     return (
         <Stack gap={2}>
             <Select onChange={(e) => setDpt(e.target.value)} rounded='sm' focusBorderColor={'bee.500'} size={'md'}>
@@ -34,7 +42,7 @@ const Calques = ({ display, setDisplay, setDpt, getData }) => {
                     </Stack>
                     <AccordionPanel pb={4}>
                         <Text fontSize={'sm'}>Correspond aux parcelles en Agriculture Biologique (AB) déclarées à la PAC.<br />
-                            <Link fontSize={'sm'} color='blue.500' href='https://annuaire.agencebio.org/' isExternal>
+                            <Link fontSize={'sm'} color='blue.500' href='https://www.data.gouv.fr/fr/datasets/parcelles-en-agriculture-biologique-ab-declarees-a-la-pac/' isExternal>
                                 source <ExternalLinkIcon mx='1px' />
                             </Link>
                         </Text>
@@ -74,7 +82,7 @@ const Calques = ({ display, setDisplay, setDpt, getData }) => {
                     </Stack>
                     <AccordionPanel pb={4}>
                         <Text fontSize={'sm'}>Correspond aux sites et sols pollués (ou potentiellement pollués) appelant une action des pouvoirs publics, à titre préventif ou curatif (ex BASOL).<br />
-                            <Link fontSize={'sm'} color='blue.500' href='https://www.georisques.gouv.fr/' isExternal>
+                            <Link fontSize={'sm'} color='blue.500' href='https://www.georisques.gouv.fr/donnees/bases-de-donnees/sites-et-sols-pollues-ou-potentiellement-pollues' isExternal>
                                 source <ExternalLinkIcon mx='1px' />
                             </Link>
                         </Text>
@@ -94,7 +102,7 @@ const Calques = ({ display, setDisplay, setDpt, getData }) => {
                     </Stack>
                     <AccordionPanel pb={4}>
                         <Text fontSize={'sm'}>Correspond aux Installations classées pour la protection de l'environnement (ICPE) soumises à autorisation ou à enregistrement (en construction, en fonctionnement ou en cessation d'activité)<br />
-                            <Link fontSize={'sm'} color='blue.500' href='https://www.georisques.gouv.fr/' isExternal>
+                            <Link fontSize={'sm'} color='blue.500' href='https://www.georisques.gouv.fr/donnees/bases-de-donnees/installations-industrielles' isExternal>
                                 source <ExternalLinkIcon mx='1px' />
                             </Link>
                         </Text>
@@ -135,6 +143,47 @@ const Calques = ({ display, setDisplay, setDpt, getData }) => {
                     <AccordionPanel pb={4}>
                         <Text fontSize={'sm'}>Correspond aux éoliennes composant les parcs éoliens terrestres<br />
                             <Link fontSize={'sm'} color='blue.500' href='https://www.georisques.gouv.fr/donnees/bases-de-donnees/eolien-terrestre' isExternal>
+                                source <ExternalLinkIcon mx='1px' />
+                            </Link>
+                        </Text>
+                        <Badge textTransform={'none'} colorScheme={'red'}>Attention, peut ne pas être à jour.</Badge>
+                    </AccordionPanel>
+                </AccordionItem>
+
+                {/* Incinérateurs */}
+                <AccordionItem border={'0px'}>
+                    <Stack align={'center'} direction={'row'}>
+                        <Switch isChecked={display.inci} onChange={(e) => getData('inci', e.target.checked)} colorScheme='bee' />
+                        <Heading>
+                            <AccordionButton>
+                                Incinérateurs
+                                <AccordionIcon />
+                            </AccordionButton>
+                        </Heading>
+                    </Stack>
+                    <AccordionPanel pb={4}>
+                        <Text fontSize={'sm'}>Liste des incinérateurs d'ordures ménagères de la région Occitanie.<br />
+                            <Link fontSize={'sm'} color='blue.500' href='https://catalogue.picto-occitanie.fr/geonetwork/srv/fre/catalog.search#/metadata/db30e1f2-cffc-435d-9029-f36640957992' isExternal>
+                                source <ExternalLinkIcon mx='1px' />
+                            </Link>
+                        </Text>
+                    </AccordionPanel>
+                </AccordionItem>
+
+                {/* Incinérateurs */}
+                <AccordionItem border={'0px'}>
+                    <Stack align={'center'} direction={'row'}>
+                        <Switch isChecked={display.dechets} onChange={(e) => getData('dechets', e.target.checked)} colorScheme='bee' />
+                        <Heading>
+                            <AccordionButton>
+                                Traitement des déchets
+                                <AccordionIcon />
+                            </AccordionButton>
+                        </Heading>
+                    </Stack>
+                    <AccordionPanel pb={4}>
+                        <Text fontSize={'sm'}>Localisation des installations de traitement de déchets résiduels en Occitanie en 2020. Il s'agit des Installations de Stockage de Déchets Non Dangereux (ISDND), des Unités d'Incinération des Ordures Ménagères (UIOM), les Unités de Valorisation Energétique (UVE),et les installations effectuant un Traitement Mécano-Biologique (TMB).<br />
+                            <Link fontSize={'sm'} color='blue.500' href='https://catalogue.picto-occitanie.fr/geonetwork/srv/fre/catalog.search#/metadata/57734334-a78f-4cc5-8615-f96ce474312d' isExternal>
                                 source <ExternalLinkIcon mx='1px' />
                             </Link>
                         </Text>

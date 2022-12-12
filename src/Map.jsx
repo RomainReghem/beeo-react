@@ -52,6 +52,10 @@ const onEach = (feature, layer, type) => {
             break;
         case 'eol': layer.bindPopup("<center><h1>Eolienne</h1></center>");
             break;
+        case 'inci': layer.bindPopup(`<center><h1>Incinérateur</h1></center><p>Exploitant : ${feature.properties.exploitant}</p>`);
+            break;
+        case 'dechets': layer.bindPopup(`<center><h1>Traitement des déchets</h1></center><p>Service : ${feature.properties.nom_servic}</p><p>Exploitant : ${feature.properties.nom_exploi}</p>`);
+            break;
     }
 }
 
@@ -62,7 +66,7 @@ const customMarker = (e, icon) => {
 
 // Data recovered from API
 let layers_data = {
-    indus: {}, fbio:{}, zbio: {}, riv: {}, pollu: {}, eol: {}, one: {}
+    indus: {}, fbio: {}, zbio: {}, riv: {}, pollu: {}, eol: {}, one: {}, inci: {}, corse: {}, dechets: {}
 }
 
 // Infos about the layers. Display is the name displayed in the search section. Color is the badge color in the search section
@@ -73,16 +77,19 @@ const eq_table = {
     riv: { display: 'libelle', color: 'blue', icon: new L.Icon({ iconUrl: '/river.png', iconSize: [36, 42] }) },
     pollu: { display: 'nom_site', color: 'red', icon: new L.Icon({ iconUrl: '/pollu.png', iconSize: [36, 42] }) },
     eol: { display: 'id_aerogenerateur', color: 'red', icon: new L.Icon({ iconUrl: '/wind.png', iconSize: [36, 42] }) },
+    inci: { display: 'exploitant', color: 'red', icon: new L.Icon.Default },
+    dechets: { display: 'nom_servic', color: 'red', icon: new L.Icon.Default }
 }
 
 const Map = () => {
+    const [randomKey, setRandomKey] = useState(Math.floor(Math.random() * 999))
     const navigate = useNavigate()
     const [searchContent, setSearchContent] = useState('')
     const [searchResponse, setSearchResponse] = useState([])
     const [to, setTo] = useState()
     const [bounds, setBounds] = useState()
     const [display, setDisplay] = useState({
-        zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false, one: false,
+        zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false, one: false, inci: false, corse: false, dechets: false
     })
 
     const getData = async (layer, checked) => {
@@ -90,11 +97,22 @@ const Map = () => {
             // We check if the object is empty. If it is, then we query the database, else we can just display the data.
             console.log(typeof dpt)
             // if (Object.keys(layers_data[layer]).length === 0) {
-                layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt:dpt, bounds:bounds } })).data
+            layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt: dpt, bounds: bounds } })).data
+            console.log(layers_data[layer])
             // }            
             setDisplay(curr => ({ ...curr, [layer]: true }))
+            // setRandomKey(Math.floor(Math.random() * 999))
         } else setDisplay(curr => ({ ...curr, [layer]: false }))
     }
+
+    const refreshZbio = async () => {
+        await getData('zbio', display.zbio)
+        setRandomKey(Math.floor(Math.random() * 999))
+    }
+
+    useEffect(() => {
+    //refreshZbio()
+    }, [bounds])
 
     const getOne = async (layer, id) => {
         setDisplay(curr => ({ ...curr, one: false }))
@@ -116,14 +134,14 @@ const Map = () => {
     }, [searchContent])
 
     // By default, only Tarn region.
-    const [dpt, setDpt] = useState('81')
+    const [dpt, setDpt] = useState('1')
 
     useEffect(() => {
         layers_data = {
-            indus: {}, fbio:{}, zbio: {}, riv: {}, pollu: {}, eol: {}, one: {}
+            indus: {}, fbio: {}, zbio: {}, riv: {}, pollu: {}, eol: {}, one: {}, inci: {}, corse: {}, dechets: {}
         }
         setDisplay({
-            zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false,
+            zbio: false, fbio: false, riv: false, pollu: false, indus: false, eol: false, inci: false, corse: false, dechets: false
         })
     }, [dpt])
 
@@ -139,17 +157,20 @@ const Map = () => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {display.zbio && Object.keys(layers_data.zbio).length > 0 && <GeoJSON data={layers_data.zbio} color='green' onEachFeature={(f, l) => onEach(f, l, 'zbio')}></GeoJSON>}
-                    {display.riv && Object.keys(layers_data.riv).length > 0 && <GeoJSON data={layers_data.riv} pointToLayer={(e) => customMarker(e, eq_table.riv.icon)} onEachFeature={(f, l) => onEach(f, l, 'riv')}></GeoJSON>}
-                    {display.fbio && Object.keys(layers_data.fbio).length > 0 && <GeoJSON data={layers_data.fbio} pointToLayer={(e) => customMarker(e, eq_table.fbio.icon)} onEachFeature={(f, l) => onEach(f, l, 'fbio')}></GeoJSON>}
-                    {display.indus && Object.keys(layers_data.indus).length > 0 && <GeoJSON data={layers_data.indus} pointToLayer={(e) => customMarker(e, eq_table.indus.icon)} onEachFeature={(f, l) => onEach(f, l, 'indus')}></GeoJSON>}
-                    {display.one && Object.keys(layers_data.one).length > 0 && <GeoJSON data={layers_data.one} pointToLayer={(e) => customMarker(e, eq_table[layers_data.one.layerName].icon)} onEachFeature={(f, l) => onEach(f, l, layers_data.one.layerName)}></GeoJSON>}
+                    {display.zbio && layers_data.zbio.features && <GeoJSON key={randomKey} data={layers_data.zbio} color='green' onEachFeature={(f, l) => onEach(f, l, 'zbio')}></GeoJSON>}
+                    {display.riv && layers_data.riv.features && <GeoJSON data={layers_data.riv} pointToLayer={(e) => customMarker(e, eq_table.riv.icon)} onEachFeature={(f, l) => onEach(f, l, 'riv')}></GeoJSON>}
+                    {display.fbio && layers_data.fbio.features && <GeoJSON data={layers_data.fbio} pointToLayer={(e) => customMarker(e, eq_table.fbio.icon)} onEachFeature={(f, l) => onEach(f, l, 'fbio')}></GeoJSON>}
+                    {display.indus && layers_data.indus.features && <GeoJSON data={layers_data.indus} pointToLayer={(e) => customMarker(e, eq_table.indus.icon)} onEachFeature={(f, l) => onEach(f, l, 'indus')}></GeoJSON>}
+                    {display.one && layers_data.one.features && <GeoJSON data={layers_data.one} pointToLayer={(e) => customMarker(e, eq_table[layers_data.one.layerName].icon)} onEachFeature={(f, l) => onEach(f, l, layers_data.one.layerName)}></GeoJSON>}
                     {
-                        display.pollu && <> <GeoJSON data={layers_data.pollu} color='red' pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON>
+                        display.pollu && layers_data.pollu.features && <> <GeoJSON data={layers_data.pollu} color='red' pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON>
                             {/* <GeoJSON data={onlyTarn ? pollusolPoints : pollusolPointsOccitanie} pointToLayer={(e) => customMarker(e, eq_table.pollu.icon)} onEachFeature={(f, l) => onEach(f, l, 'pollu')}></GeoJSON> */}
                         </>
                     }
-                    {display.eol && Object.keys(layers_data.zbio).length > 0 && <GeoJSON data={layers_data.eol} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
+                    {display.eol && layers_data.eol.features && <GeoJSON data={layers_data.eol} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
+                    {display.inci && layers_data.inci.features && <GeoJSON data={layers_data.inci} onEachFeature={(f, l) => onEach(f, l, 'inci')}></GeoJSON>}
+                    {display.corse && layers_data.corse.features && <GeoJSON data={layers_data.corse}></GeoJSON>}
+                    {display.dechets && layers_data.dechets.features && <GeoJSON data={layers_data.dechets} onEachFeature={(f, l) => onEach(f, l, 'dechets')}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                     <LocationMarker />
@@ -168,12 +189,12 @@ const Map = () => {
                                     pointerEvents='none'
                                     children={<SearchIcon color='gray.300' />}
                                 />
-                                <Input onChange={(e) => setSearchContent(e.target.value)} focusBorderColor="green.500" rounded={'sm'} type='tel' placeholder='Rechercher dans les calques' />
+                                <Input onChange={(e) => setSearchContent(e.target.value)} focusBorderColor="green.500" rounded={'sm'} type='text' placeholder='Rechercher dans les calques' />
                             </InputGroup>
                             {Object.keys(searchResponse).length && <Stack marginTop={'0px !important'} p='2' border={'1px solid'} borderColor='gray.200' borderTop={'none'} roundedBottom='sm' maxH='200px' overflowY={'scroll'}>
                                 {
                                     Object.keys(searchResponse).map(layer => {
-                                        return searchResponse[layer].map(line => {                                            
+                                        return searchResponse[layer].map(line => {
                                             return (
                                                 <>
                                                     <Stack direction={'row'} align='center'
@@ -213,7 +234,7 @@ const Map = () => {
                         </Stack>
                         <Divider borderColor={'gray.400'}></Divider>
                         <Heading fontSize={'lg'}>Sélection des calques</Heading>
-                        <Calques display={display} setDisplay={setDisplay} setDpt={setDpt} getData={getData} />
+                        <Calques display={display} setDisplay={setDisplay} setDpt={setDpt} dpt={dpt} getData={getData} />
                     </Stack>
                 </Stack>
 

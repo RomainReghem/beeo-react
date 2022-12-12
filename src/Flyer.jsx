@@ -14,7 +14,6 @@ const Flyer = ({ to, setBounds }) => {
 
     const getMapBounds = () => {
         let b = map.getBounds();
-        console.log(map.get)
         setBounds(`{"type": "Polygon", "coordinates": 
         [[[${b.getNorthWest().lng} , ${b.getNorthWest().lat} ], 
         [ ${b.getNorthEast().lng}, ${b.getNorthEast().lat} ], 
