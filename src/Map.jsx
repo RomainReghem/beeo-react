@@ -77,8 +77,8 @@ const eq_table = {
     riv: { display: 'libelle', color: 'blue', icon: new L.Icon({ iconUrl: '/river.png', iconSize: [36, 42] }) },
     pollu: { display: 'nom_site', color: 'red', icon: new L.Icon({ iconUrl: '/pollu.png', iconSize: [36, 42] }) },
     eol: { display: 'id_aerogenerateur', color: 'red', icon: new L.Icon({ iconUrl: '/wind.png', iconSize: [36, 42] }) },
-    inci: { display: 'exploitant', color: 'red', icon: new L.Icon.Default },
-    dechets: { display: 'nom_servic', color: 'red', icon: new L.Icon.Default }
+    inci: { display: 'exploitant', color: 'red', icon: new L.Icon({ iconUrl: '/dechet.png', iconSize: [36, 42] }) },
+    dechets: { display: 'nom_servic', color: 'red', icon: new L.Icon({ iconUrl: '/dechet.png', iconSize: [36, 42] }) }
 }
 
 const Map = () => {
@@ -96,10 +96,10 @@ const Map = () => {
         if (checked) {
             // We check if the object is empty. If it is, then we query the database, else we can just display the data.
             console.log(typeof dpt)
-            // if (Object.keys(layers_data[layer]).length === 0) {
-            layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt: dpt, bounds: bounds } })).data
-            console.log(layers_data[layer])
-            // }            
+            if (Object.keys(layers_data[layer]).length === 0 || layer == "zbio") {
+                layers_data[layer] = (await axios.get('/layers', { params: { layer: layer, dpt: dpt, bounds: bounds } })).data
+                console.log(layers_data[layer])
+            }
             setDisplay(curr => ({ ...curr, [layer]: true }))
             // setRandomKey(Math.floor(Math.random() * 999))
         } else setDisplay(curr => ({ ...curr, [layer]: false }))
@@ -111,7 +111,7 @@ const Map = () => {
     }
 
     useEffect(() => {
-    //refreshZbio()
+        refreshZbio()
     }, [bounds])
 
     const getOne = async (layer, id) => {
@@ -168,9 +168,9 @@ const Map = () => {
                         </>
                     }
                     {display.eol && layers_data.eol.features && <GeoJSON data={layers_data.eol} pointToLayer={(e) => customMarker(e, eq_table.eol.icon)} onEachFeature={(f, l) => onEach(f, l, 'eol')}></GeoJSON>}
-                    {display.inci && layers_data.inci.features && <GeoJSON data={layers_data.inci} onEachFeature={(f, l) => onEach(f, l, 'inci')}></GeoJSON>}
+                    {display.inci && layers_data.inci.features && <GeoJSON data={layers_data.inci} pointToLayer={(e) => customMarker(e, eq_table.dechets.icon)} onEachFeature={(f, l) => onEach(f, l, 'inci')}></GeoJSON>}
                     {display.corse && layers_data.corse.features && <GeoJSON data={layers_data.corse}></GeoJSON>}
-                    {display.dechets && layers_data.dechets.features && <GeoJSON data={layers_data.dechets} onEachFeature={(f, l) => onEach(f, l, 'dechets')}></GeoJSON>}
+                    {display.dechets && layers_data.dechets.features && <GeoJSON data={layers_data.dechets} pointToLayer={(e) => customMarker(e, eq_table.dechets.icon)} onEachFeature={(f, l) => onEach(f, l, 'dechets')}></GeoJSON>}
 
                     <AddMarker radius={userMarkersRadius} placementActivated={placementActivated} />
                     <LocationMarker />
