@@ -72,7 +72,7 @@ let layers_data = {
 // Infos about the layers. Display is the name displayed in the search section. Color is the badge color in the search section
 const eq_table = {
     zbio: { display: 'lbl_cultu', color: 'green.500', },
-    fbio: { display: 'nom', color: 'green', icon: new L.Icon({ iconUrl: '/farm.png', iconSize: [36, 42] }) },
+    fbio: { display: 'produits', color: 'green', icon: new L.Icon({ iconUrl: '/farm.png', iconSize: [36, 42] }) },
     indus: { display: 'nom_ets', color: 'red', icon: new L.Icon({ iconUrl: '/indus.png', iconSize: [36, 42] }) },
     riv: { display: 'libelle', color: 'blue', icon: new L.Icon({ iconUrl: '/river.png', iconSize: [36, 42] }) },
     pollu: { display: 'nom_site', color: 'red', icon: new L.Icon({ iconUrl: '/pollu.png', iconSize: [36, 42] }) },

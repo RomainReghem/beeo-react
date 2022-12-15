@@ -13,8 +13,8 @@ const Calques = ({ display, setDisplay, setDpt, dpt, getData }) => {
     return (
         <Stack gap={2}>
             <Select onChange={(e) => setDpt(e.target.value)} rounded='sm' focusBorderColor={'bee.500'} size={'md'}>
-                <option value='81'>Tarn</option>
                 <option value='1'>Occitanie</option>
+                <option value='81'>Tarn</option>
                 <option value='09'>Ariège</option>
                 <option value='11'>Aude</option>
                 <option value='12'>Aveyron</option>
